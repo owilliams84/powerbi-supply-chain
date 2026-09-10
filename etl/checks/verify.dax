@@ -1,0 +1,66 @@
+EVALUATE
+UNION(
+    SELECTCOLUMNS(
+        SUMMARIZECOLUMNS(
+            'Date'[Year],
+            "v_orders", [Orders], "v_lines", [Order Lines], "v_net", [Net Sales],
+            "v_profit", [Profit], "v_gross", [Gross Sales (source column)],
+            "v_shipped", [Shipped Orders], "v_late", [Late Orders], "v_late_rate", [Late Rate %],
+            "v_cancelled", [Cancelled Orders], "v_days", [Average Actual Days]
+        ),
+        "grain", "year", "key", FORMAT('Date'[Year], "0"),
+        "orders", [v_orders], "lines", [v_lines], "net", ROUND([v_net], 2),
+        "profit", ROUND([v_profit], 2), "gross", ROUND([v_gross], 2),
+        "shipped", [v_shipped], "late", [v_late], "late_rate", ROUND([v_late_rate], 6),
+        "cancelled", [v_cancelled], "days", ROUND([v_days], 6)
+    ),
+    SELECTCOLUMNS(
+        SUMMARIZECOLUMNS(
+            'Shipping Mode'[Shipping Mode],
+            "v_orders", [Orders], "v_lines", [Order Lines], "v_net", [Net Sales],
+            "v_profit", [Profit], "v_gross", [Gross Sales (source column)],
+            "v_shipped", [Shipped Orders], "v_late", [Late Orders], "v_late_rate", [Late Rate %],
+            "v_cancelled", [Cancelled Orders], "v_days", [Average Actual Days]
+        ),
+        "grain", "mode", "key", 'Shipping Mode'[Shipping Mode],
+        "orders", [v_orders], "lines", [v_lines], "net", ROUND([v_net], 2),
+        "profit", ROUND([v_profit], 2), "gross", ROUND([v_gross], 2),
+        "shipped", [v_shipped], "late", [v_late], "late_rate", ROUND([v_late_rate], 6),
+        "cancelled", [v_cancelled], "days", ROUND([v_days], 6)
+    ),
+    SELECTCOLUMNS(
+        SUMMARIZECOLUMNS(
+            'Geography'[Market],
+            "v_orders", [Orders], "v_lines", [Order Lines], "v_net", [Net Sales],
+            "v_profit", [Profit], "v_gross", [Gross Sales (source column)],
+            "v_shipped", [Shipped Orders], "v_late", [Late Orders], "v_late_rate", [Late Rate %],
+            "v_cancelled", [Cancelled Orders], "v_days", [Average Actual Days]
+        ),
+        "grain", "market", "key", 'Geography'[Market],
+        "orders", [v_orders], "lines", [v_lines], "net", ROUND([v_net], 2),
+        "profit", ROUND([v_profit], 2), "gross", ROUND([v_gross], 2),
+        "shipped", [v_shipped], "late", [v_late], "late_rate", ROUND([v_late_rate], 6),
+        "cancelled", [v_cancelled], "days", ROUND([v_days], 6)
+    ),
+    SELECTCOLUMNS(
+        SUMMARIZECOLUMNS(
+            'Product'[Department],
+            "v_orders", [Orders], "v_lines", [Order Lines], "v_net", [Net Sales],
+            "v_profit", [Profit], "v_gross", [Gross Sales (source column)],
+            "v_shipped", [Shipped Orders], "v_late", [Late Orders], "v_late_rate", [Late Rate %],
+            "v_cancelled", [Cancelled Orders], "v_days", [Average Actual Days]
+        ),
+        "grain", "department", "key", 'Product'[Department],
+        "orders", [v_orders], "lines", [v_lines], "net", ROUND([v_net], 2),
+        "profit", ROUND([v_profit], 2), "gross", ROUND([v_gross], 2),
+        "shipped", [v_shipped], "late", [v_late], "late_rate", ROUND([v_late_rate], 6),
+        "cancelled", [v_cancelled], "days", ROUND([v_days], 6)
+    ),
+    ROW(
+        "grain", "all", "key", "all",
+        "orders", [Orders], "lines", [Order Lines], "net", ROUND([Net Sales], 2),
+        "profit", ROUND([Profit], 2), "gross", ROUND([Gross Sales (source column)], 2),
+        "shipped", [Shipped Orders], "late", [Late Orders], "late_rate", ROUND([Late Rate %], 6),
+        "cancelled", [Cancelled Orders], "days", ROUND([Average Actual Days], 6)
+    )
+)

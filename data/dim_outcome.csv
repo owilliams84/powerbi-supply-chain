@@ -1,0 +1,24 @@
+OutcomeKey,PaymentType,OrderStatus,DeliveryStatus,DeliverySort,IsCancelled,IsSuspectedFraud
+1,Cash,Closed,Advance shipping,1,No,No
+2,Debit,Complete,Advance shipping,1,No,No
+3,Debit,On hold,Advance shipping,1,No,No
+4,Payment,Payment review,Advance shipping,1,No,No
+5,Transfer,Pending,Advance shipping,1,No,No
+6,Payment,Pending payment,Advance shipping,1,No,No
+7,Transfer,Processing,Advance shipping,1,No,No
+8,Cash,Closed,Late delivery,3,No,No
+9,Debit,Complete,Late delivery,3,No,No
+10,Debit,On hold,Late delivery,3,No,No
+11,Payment,Payment review,Late delivery,3,No,No
+12,Transfer,Pending,Late delivery,3,No,No
+13,Payment,Pending payment,Late delivery,3,No,No
+14,Transfer,Processing,Late delivery,3,No,No
+15,Transfer,Canceled,Cancelled,4,Yes,No
+16,Transfer,Suspected fraud,Cancelled,4,Yes,Yes
+17,Cash,Closed,Shipping on time,2,No,No
+18,Debit,Complete,Shipping on time,2,No,No
+19,Debit,On hold,Shipping on time,2,No,No
+20,Payment,Payment review,Shipping on time,2,No,No
+21,Transfer,Pending,Shipping on time,2,No,No
+22,Payment,Pending payment,Shipping on time,2,No,No
+23,Transfer,Processing,Shipping on time,2,No,No

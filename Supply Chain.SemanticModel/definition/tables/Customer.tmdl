@@ -1,0 +1,54 @@
+/// One row per customer id, 20,652 of them. Segment and the store the order was placed
+/// through - which is all the customer columns honestly hold. The names are placeholders
+/// (65,150 order lines belong to a 'Mary', 64,104 to a 'Smith'), email and password are
+/// masked to XXXXXXXXX, and the street addresses are generated. All of that is dropped in
+/// the ETL.
+table Customer
+	lineageTag: e11170ee-c0f0-5ec9-b8f0-53a56d3b5240
+
+	column 'Customer Key'
+		dataType: int64
+		isHidden
+		isKey
+		formatString: 0
+		lineageTag: f257f13a-7cb6-590e-b244-fbef5eb70cdb
+		summarizeBy: none
+		sourceColumn: CustomerKey
+
+	column Segment
+		dataType: string
+		lineageTag: fd83a2aa-489d-56b6-94f0-954c8cb089ef
+		summarizeBy: none
+		sourceColumn: Segment
+
+	column 'Store City'
+		dataType: string
+		lineageTag: 67bd9d6f-4046-590b-a644-368757cadc0c
+		summarizeBy: none
+		sourceColumn: StoreCity
+
+	column 'Store State'
+		dataType: string
+		lineageTag: 3e4301f3-4d70-59e8-9a5c-4c8830d790f5
+		summarizeBy: none
+		sourceColumn: StoreState
+
+	/// United States or Puerto Rico. Every store is in one or the other; the
+	/// orders go to 164 countries.
+	column 'Store Country'
+		dataType: string
+		lineageTag: ce94626c-5da3-588c-9d41-f5857e58bb66
+		summarizeBy: none
+		sourceColumn: StoreCountry
+
+	partition Customer = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(Web.Contents("https://raw.githubusercontent.com/owilliams84/powerbi-supply-chain/main/data/dim_customer.csv"), [Delimiter=",", Columns=5, Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+				    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    #"Applied Types" = Table.TransformColumnTypes(#"Promoted Headers", {{"CustomerKey", Int64.Type}, {"Segment", type text}, {"StoreCity", type text}, {"StoreState", type text}, {"StoreCountry", type text}})
+				in
+				    #"Applied Types"
+
+	annotation PBI_ResultType = Table

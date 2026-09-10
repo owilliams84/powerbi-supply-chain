@@ -1,0 +1,23 @@
+relationship 'Date to Order Lines'
+	fromColumn: 'Order Lines'.Date
+	toColumn: Date.Date
+
+relationship 'Product to Order Lines'
+	fromColumn: 'Order Lines'.'Product Key'
+	toColumn: Product.'Product Key'
+
+relationship 'Customer to Order Lines'
+	fromColumn: 'Order Lines'.'Customer Key'
+	toColumn: Customer.'Customer Key'
+
+relationship 'Geography to Order Lines'
+	fromColumn: 'Order Lines'.'Geo Key'
+	toColumn: Geography.'Geo Key'
+
+relationship 'Mode to Order Lines'
+	fromColumn: 'Order Lines'.'Mode Key'
+	toColumn: 'Shipping Mode'.'Mode Key'
+
+relationship 'Outcome to Order Lines'
+	fromColumn: 'Order Lines'.'Outcome Key'
+	toColumn: Outcome.'Outcome Key'

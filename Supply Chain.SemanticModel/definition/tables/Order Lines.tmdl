@@ -1,0 +1,212 @@
+/// One row per order line - 180,519 lines on 65,752 orders. Order-level fields (mode,
+/// status, delivery days) repeat on every line of an order; the ETL proves they never
+/// vary within one, which is what lets the order-level measures count distinct orders
+/// straight off this table.
+///
+/// Gross Sales is the source's 'Sales' column: price times quantity, before discount.
+/// Net Sales is 'Order Item Total', the money that changed hands. Profit is the source's
+/// 'Order Profit Per Order', which despite the name is per line.
+table 'Order Lines'
+	lineageTag: bcce1791-a2e0-5bd4-aff7-78ea00915bdd
+
+	column 'Line ID'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 10e4a3c1-796b-59e1-b66a-ce47cadaec43
+		summarizeBy: none
+		sourceColumn: LineID
+
+	column 'Order ID'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 64f7ed8e-8077-5ffc-88c9-8c263fba2149
+		summarizeBy: none
+		sourceColumn: OrderID
+
+	column Date
+		dataType: dateTime
+		isHidden
+		formatString: yyyy-mm-dd
+		lineageTag: c6b06a70-ed3b-5555-8b9a-d98233f7752a
+		summarizeBy: none
+		sourceColumn: Date
+
+	column 'Ship Date'
+		dataType: dateTime
+		isHidden
+		formatString: yyyy-mm-dd
+		lineageTag: 7ca11786-98c3-519f-b6d2-438419660d30
+		summarizeBy: none
+		sourceColumn: ShipDate
+
+	column 'Customer Key'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 0a43516f-85a7-5585-ba76-36cc1aec9f79
+		summarizeBy: none
+		sourceColumn: CustomerKey
+
+	column 'Product Key'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 1df0bef7-2d59-5114-9123-8191d9b2a888
+		summarizeBy: none
+		sourceColumn: ProductKey
+
+	column 'Geo Key'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 69753681-3bd9-5c44-b52e-1ccc03f8e7c3
+		summarizeBy: none
+		sourceColumn: GeoKey
+
+	column 'Mode Key'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 25ae2f0a-e4cc-5cff-95ff-f8e2cabfdeae
+		summarizeBy: none
+		sourceColumn: ModeKey
+
+	column 'Outcome Key'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 9bc8de0e-4dff-5fd8-8f36-fa0d38d5f492
+		summarizeBy: none
+		sourceColumn: OutcomeKey
+
+	column 'Promised Days'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 02d053cf-f3df-5e09-8e11-8e5044f93683
+		summarizeBy: none
+		sourceColumn: PromisedDays
+
+	/// Days from order to shipment. Uniform from 2 to 6 for both Second Class and
+	/// Standard Class - the two modes promise different things and deliver the same.
+	column 'Actual Days'
+		dataType: int64
+		formatString: 0
+		lineageTag: 7776e84b-2a66-5992-9bde-d52ddb1ca4c7
+		summarizeBy: none
+		sourceColumn: ActualDays
+
+	/// Actual less promised. Negative is early.
+	column 'Days Late'
+		dataType: int64
+		formatString: 0
+		lineageTag: 1b9ed9e5-bc8c-58c0-a3fa-c8f80874b9ce
+		summarizeBy: none
+		sourceColumn: DaysLate
+
+	/// The source's delivery status says late. Never Yes for a cancelled order.
+	column 'Is Late'
+		dataType: string
+		lineageTag: 9423023f-7e7a-56a9-b1c8-6aedaebe3ee6
+		summarizeBy: none
+		sourceColumn: IsLate
+
+	column Quantity
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 142bf11a-5e39-5c1b-a316-26c6fb9f2f51
+		summarizeBy: none
+		sourceColumn: Quantity
+
+	column 'Unit Price'
+		dataType: double
+		isHidden
+		formatString: \$#,0.00
+		lineageTag: 091baeb3-a072-5442-aa9f-1d9fa22e7b38
+		summarizeBy: none
+		sourceColumn: UnitPrice
+
+	column 'Gross Sales'
+		dataType: double
+		isHidden
+		formatString: \$#,0.00
+		lineageTag: 468ba2e9-3229-5f6f-aea3-215024c7897b
+		summarizeBy: none
+		sourceColumn: GrossSales
+
+	column 'Discount Rate'
+		dataType: double
+		isHidden
+		formatString: 0.0%
+		lineageTag: 9ffa67c4-6caf-5aee-8387-d8ed28f7656f
+		summarizeBy: none
+		sourceColumn: DiscountRate
+
+	column Discount
+		dataType: double
+		isHidden
+		formatString: \$#,0.00
+		lineageTag: 0e675585-396c-5252-bba8-5eae34098709
+		summarizeBy: none
+		sourceColumn: Discount
+
+	column 'Net Sales'
+		dataType: double
+		isHidden
+		formatString: \$#,0.00
+		lineageTag: fc9a1502-9ba3-5ebb-b837-854a27117037
+		summarizeBy: none
+		sourceColumn: NetSales
+
+	column Profit
+		dataType: double
+		isHidden
+		formatString: \$#,0.00
+		lineageTag: 66f112ae-651a-5a6b-b69b-639112accf01
+		summarizeBy: none
+		sourceColumn: Profit
+
+	partition 'Order Lines 2015' = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(Web.Contents("https://raw.githubusercontent.com/owilliams84/powerbi-supply-chain/main/data/fact_order_line_2015.csv"), [Delimiter=",", Columns=20, Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+				    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    #"Applied Types" = Table.TransformColumnTypes(#"Promoted Headers", {{"LineID", Int64.Type}, {"OrderID", Int64.Type}, {"Date", type date}, {"ShipDate", type date}, {"CustomerKey", Int64.Type}, {"ProductKey", Int64.Type}, {"GeoKey", Int64.Type}, {"ModeKey", Int64.Type}, {"OutcomeKey", Int64.Type}, {"PromisedDays", Int64.Type}, {"ActualDays", Int64.Type}, {"DaysLate", Int64.Type}, {"IsLate", type text}, {"Quantity", Int64.Type}, {"UnitPrice", type number}, {"GrossSales", type number}, {"DiscountRate", type number}, {"Discount", type number}, {"NetSales", type number}, {"Profit", type number}})
+				in
+				    #"Applied Types"
+
+	partition 'Order Lines 2016' = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(Web.Contents("https://raw.githubusercontent.com/owilliams84/powerbi-supply-chain/main/data/fact_order_line_2016.csv"), [Delimiter=",", Columns=20, Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+				    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    #"Applied Types" = Table.TransformColumnTypes(#"Promoted Headers", {{"LineID", Int64.Type}, {"OrderID", Int64.Type}, {"Date", type date}, {"ShipDate", type date}, {"CustomerKey", Int64.Type}, {"ProductKey", Int64.Type}, {"GeoKey", Int64.Type}, {"ModeKey", Int64.Type}, {"OutcomeKey", Int64.Type}, {"PromisedDays", Int64.Type}, {"ActualDays", Int64.Type}, {"DaysLate", Int64.Type}, {"IsLate", type text}, {"Quantity", Int64.Type}, {"UnitPrice", type number}, {"GrossSales", type number}, {"DiscountRate", type number}, {"Discount", type number}, {"NetSales", type number}, {"Profit", type number}})
+				in
+				    #"Applied Types"
+
+	partition 'Order Lines 2017' = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(Web.Contents("https://raw.githubusercontent.com/owilliams84/powerbi-supply-chain/main/data/fact_order_line_2017.csv"), [Delimiter=",", Columns=20, Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+				    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    #"Applied Types" = Table.TransformColumnTypes(#"Promoted Headers", {{"LineID", Int64.Type}, {"OrderID", Int64.Type}, {"Date", type date}, {"ShipDate", type date}, {"CustomerKey", Int64.Type}, {"ProductKey", Int64.Type}, {"GeoKey", Int64.Type}, {"ModeKey", Int64.Type}, {"OutcomeKey", Int64.Type}, {"PromisedDays", Int64.Type}, {"ActualDays", Int64.Type}, {"DaysLate", Int64.Type}, {"IsLate", type text}, {"Quantity", Int64.Type}, {"UnitPrice", type number}, {"GrossSales", type number}, {"DiscountRate", type number}, {"Discount", type number}, {"NetSales", type number}, {"Profit", type number}})
+				in
+				    #"Applied Types"
+
+	partition 'Order Lines 2018' = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(Web.Contents("https://raw.githubusercontent.com/owilliams84/powerbi-supply-chain/main/data/fact_order_line_2018.csv"), [Delimiter=",", Columns=20, Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+				    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    #"Applied Types" = Table.TransformColumnTypes(#"Promoted Headers", {{"LineID", Int64.Type}, {"OrderID", Int64.Type}, {"Date", type date}, {"ShipDate", type date}, {"CustomerKey", Int64.Type}, {"ProductKey", Int64.Type}, {"GeoKey", Int64.Type}, {"ModeKey", Int64.Type}, {"OutcomeKey", Int64.Type}, {"PromisedDays", Int64.Type}, {"ActualDays", Int64.Type}, {"DaysLate", Int64.Type}, {"IsLate", type text}, {"Quantity", Int64.Type}, {"UnitPrice", type number}, {"GrossSales", type number}, {"DiscountRate", type number}, {"Discount", type number}, {"NetSales", type number}, {"Profit", type number}})
+				in
+				    #"Applied Types"
+
+	annotation PBI_ResultType = Table

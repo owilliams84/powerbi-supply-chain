@@ -1,0 +1,58 @@
+/// The 118 products ever sold, with category and department. 'Catalogue' separates the
+/// 101 on sale from 2015 from the 17 that appear with the October 2017 switch - laptops,
+/// lawn mowers and CDs in a file that had been sports and outdoor kit. Only one product
+/// sells on both sides of the switch.
+table Product
+	lineageTag: 471b486b-dae8-59b3-9689-7517add4496c
+
+	column 'Product Key'
+		dataType: int64
+		isHidden
+		isKey
+		formatString: 0
+		lineageTag: 5cd4f8d4-e685-5d31-bcdc-b38e7c11c756
+		summarizeBy: none
+		sourceColumn: ProductKey
+
+	column Product
+		dataType: string
+		lineageTag: 1a24b1de-456e-5dc5-a7ac-713be4d35d05
+		summarizeBy: none
+		sourceColumn: Product
+
+	column Category
+		dataType: string
+		lineageTag: 17a1d277-6454-56b3-b213-14b0bcc3926e
+		summarizeBy: none
+		sourceColumn: Category
+
+	column Department
+		dataType: string
+		lineageTag: 4851d000-6adf-5b37-ba2f-42596d2fb9a7
+		summarizeBy: none
+		sourceColumn: Department
+
+	column 'List Price'
+		dataType: double
+		formatString: \$#,0.00
+		lineageTag: f075927f-a194-5e38-bc02-4e49af5793cc
+		summarizeBy: none
+		sourceColumn: ListPrice
+
+	column Catalogue
+		dataType: string
+		lineageTag: ed42c601-2f0d-531c-9384-799a67ea0670
+		summarizeBy: none
+		sourceColumn: Catalogue
+
+	partition Product = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(Web.Contents("https://raw.githubusercontent.com/owilliams84/powerbi-supply-chain/main/data/dim_product.csv"), [Delimiter=",", Columns=6, Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+				    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    #"Applied Types" = Table.TransformColumnTypes(#"Promoted Headers", {{"ProductKey", Int64.Type}, {"Product", type text}, {"Category", type text}, {"Department", type text}, {"ListPrice", type number}, {"Catalogue", type text}})
+				in
+				    #"Applied Types"
+
+	annotation PBI_ResultType = Table

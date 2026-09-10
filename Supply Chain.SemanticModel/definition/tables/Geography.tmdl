@@ -1,0 +1,47 @@
+/// Where the order was delivered: market, region and country. The source writes the
+/// countries in Spanish; the ETL translates all 164 and fails on any it does not know.
+///
+/// Read 'Market' with care. In most months every order goes to one market, so a split
+/// by market is mostly a split by month.
+table Geography
+	lineageTag: b79ed37c-2380-5d0b-8194-104ac9aad891
+
+	column 'Geo Key'
+		dataType: int64
+		isHidden
+		isKey
+		formatString: 0
+		lineageTag: 21004812-e8f7-5a1d-bc83-220adf356205
+		summarizeBy: none
+		sourceColumn: GeoKey
+
+	column Market
+		dataType: string
+		lineageTag: 5e9e5aca-3be0-53a8-8644-aa8bfcb85db7
+		summarizeBy: none
+		sourceColumn: Market
+
+	column Region
+		dataType: string
+		lineageTag: 6ff3da84-8b0b-527f-92da-70c15f8837c2
+		summarizeBy: none
+		sourceColumn: Region
+
+	column Country
+		dataType: string
+		dataCategory: Country
+		lineageTag: 1b38485c-3926-5eae-a008-37376eca2151
+		summarizeBy: none
+		sourceColumn: Country
+
+	partition Geography = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(Web.Contents("https://raw.githubusercontent.com/owilliams84/powerbi-supply-chain/main/data/dim_geography.csv"), [Delimiter=",", Columns=4, Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+				    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    #"Applied Types" = Table.TransformColumnTypes(#"Promoted Headers", {{"GeoKey", Int64.Type}, {"Market", type text}, {"Region", type text}, {"Country", type text}})
+				in
+				    #"Applied Types"
+
+	annotation PBI_ResultType = Table

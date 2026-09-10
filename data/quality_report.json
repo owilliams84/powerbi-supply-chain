@@ -1,0 +1,158 @@
+{
+  "source_sha256": "fa6d022ed437155e1a2f0378710602848703c8a7f203f7ff5d77805bf8480aa6",
+  "rows": 180519,
+  "misnamed_columns": {
+    "Sales": "price x quantity before discount - gross, not revenue",
+    "Order Item Total": "the net line value; this is revenue",
+    "Order Profit Per Order": "per line, not per order: it varies within 69.8% of orders",
+    "Benefit per order": "an exact duplicate of Order Profit Per Order",
+    "Sales per customer": "an exact duplicate of Order Item Total, per line",
+    "Late_delivery_risk": "not a risk score: 1 exactly when Delivery Status is Late delivery"
+  },
+  "discount_rate_mismatch": {
+    "lines_over_1_cent": 10029,
+    "max_difference": 10.0,
+    "note": "the discount amount reconciles to the line total; the stated rate does not always reconcile to it"
+  },
+  "gross_vs_net": {
+    "sales_column": 36784735.01,
+    "order_item_total": 33054402.38
+  },
+  "series_switch": {
+    "first_day_of_new_series": "2017-10-03",
+    "lines_per_order_before": 2.997,
+    "lines_per_order_after": 1.0,
+    "orders_per_day_before": {
+      "mean": 57.1,
+      "std": 3.18
+    },
+    "orders_per_day_after": {
+      "mean": 68.5,
+      "std": 0.5
+    },
+    "products_before": 101,
+    "products_after": 18,
+    "products_dropped": 100,
+    "products_added": 17
+  },
+  "lines_per_order_distribution_before": {
+    "1": 11562,
+    "2": 11447,
+    "3": 11398,
+    "4": 11704,
+    "5": 11353
+  },
+  "market_calendar": {
+    "months": 37,
+    "months_with_one_market": 26,
+    "months_where_one_market_has_90pct": 28
+  },
+  "payment_type_decides_status": {
+    "CASH": [
+      "CLOSED"
+    ],
+    "DEBIT": [
+      "COMPLETE",
+      "ON_HOLD"
+    ],
+    "PAYMENT": [
+      "PAYMENT_REVIEW",
+      "PENDING_PAYMENT"
+    ],
+    "TRANSFER": [
+      "CANCELED",
+      "PENDING",
+      "PROCESSING",
+      "SUSPECTED_FRAUD"
+    ]
+  },
+  "cancelled": {
+    "orders": 2855,
+    "lines": 7754,
+    "net_value": 1409737.3,
+    "orders_late_by_their_own_dates": 1650
+  },
+  "late_rate_shipped_orders": 0.5731,
+  "by_mode": {
+    "First Class": {
+      "promised_days": 1,
+      "actual_days": [
+        2
+      ],
+      "late_rate": 1.0,
+      "orders": 9602
+    },
+    "Same Day": {
+      "promised_days": 0,
+      "actual_days": [
+        0,
+        1
+      ],
+      "late_rate": 0.4837,
+      "orders": 3407
+    },
+    "Second Class": {
+      "promised_days": 2,
+      "actual_days": [
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "late_rate": 0.7999,
+      "orders": 12256
+    },
+    "Standard Class": {
+      "promised_days": 4,
+      "actual_days": [
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "late_rate": 0.3985,
+      "orders": 37632
+    }
+  },
+  "placeholder_names": {
+    "Mary": 65150,
+    "Smith": 64104,
+    "email_masked": true,
+    "password_masked": true
+  },
+  "empty_columns": [
+    "Product Description (all null)",
+    "Product Status (always 0)"
+  ],
+  "order_zipcode_null_share": 0.862,
+  "dropped_columns": [
+    "Customer Fname",
+    "Customer Lname",
+    "Customer Email",
+    "Customer Password",
+    "Customer Street",
+    "Customer Zipcode",
+    "Latitude",
+    "Longitude",
+    "Order Zipcode",
+    "Order City",
+    "Order State",
+    "Product Description",
+    "Product Status",
+    "Product Image",
+    "Benefit per order",
+    "Sales per customer",
+    "Late_delivery_risk"
+  ],
+  "countries_in_more_than_one_region": 1,
+  "headline": {
+    "orders": 65752,
+    "lines": 180519,
+    "net_sales_shipped": 31644665.08,
+    "profit_shipped": 3806420.63,
+    "margin_shipped": 0.1203,
+    "loss_making_line_share": 0.1871
+  }
+}

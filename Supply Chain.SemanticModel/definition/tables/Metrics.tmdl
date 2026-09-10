@@ -1,0 +1,221 @@
+/// Measure-only table. Nothing here stores data; the hidden column exists because
+/// a table needs one. Every number on the report comes from here.
+table Metrics
+	lineageTag: f5872b66-358f-5ff5-9878-ff69c147257e
+
+	measure 'Order Lines' = COUNTROWS('Order Lines')
+		formatString: #,0
+		lineageTag: 03acfbcc-94d1-5695-a3c1-cabd06c10902
+
+	/// Every order, shipped or cancelled.
+	measure Orders = DISTINCTCOUNT('Order Lines'[Order ID])
+		formatString: #,0
+		lineageTag: 5dec7b40-c367-5864-9b0f-a012a2c1c0ad
+
+	measure Units = SUM('Order Lines'[Quantity])
+		formatString: #,0
+		lineageTag: 2287c196-e6b0-589d-8a32-c4068b875573
+
+	/// About three until October 2017, then exactly one - the clearest sign of the switch.
+	measure 'Lines per Order' = DIVIDE([Order Lines], [Orders])
+		formatString: 0.00
+		lineageTag: ab58342d-1dd0-5b16-87fe-9c6cfda67160
+
+	measure 'Products Sold' = DISTINCTCOUNT('Order Lines'[Product Key])
+		formatString: #,0
+		lineageTag: cff246af-cfa2-51b2-b83c-557f29b5952d
+
+	measure Customers = DISTINCTCOUNT('Order Lines'[Customer Key])
+		formatString: #,0
+		lineageTag: fc16665b-7921-5a0e-a85c-9ffc4521b94c
+
+	/// The line total after discount, on orders that shipped. This is revenue.
+	measure 'Net Sales' = CALCULATE(SUM('Order Lines'[Net Sales]), KEEPFILTERS('Outcome'[Is Cancelled] = "No"))
+		formatString: \$#,0
+		lineageTag: a11427da-335a-5828-a71e-3d46f7acd26a
+
+	/// What summing the source's 'Sales' column gives: price times quantity before discount, on
+	/// every order including the cancelled ones. Kept to show how far it overstates.
+	measure 'Gross Sales (source column)' = SUM('Order Lines'[Gross Sales])
+		formatString: \$#,0
+		lineageTag: b66fb79a-2062-563b-927b-da690eeca44c
+
+	measure Overstatement = [Gross Sales (source column)] - [Net Sales]
+		formatString: \$#,0
+		lineageTag: 5f5807b3-1c15-5dbb-84ff-aad8f2287280
+
+	measure 'Overstatement %' = DIVIDE([Overstatement], [Net Sales])
+		formatString: 0.0%
+		lineageTag: 0e01936b-6012-5f79-8d61-225b4b3551cd
+
+	measure Discount = CALCULATE(SUM('Order Lines'[Discount]), KEEPFILTERS('Outcome'[Is Cancelled] = "No"))
+		formatString: \$#,0
+		lineageTag: 1c4aa0d7-1caf-51b9-af66-655fc18e9422
+
+	/// Discount over gross value, shipped orders. Computed from the amounts, not averaged from
+	/// the source's rate column, which disagrees with its own amounts on 10,029 lines.
+	measure 'Discount Rate %' =
+			DIVIDE(
+			    [Discount],
+			    CALCULATE(SUM('Order Lines'[Gross Sales]), KEEPFILTERS('Outcome'[Is Cancelled] = "No"))
+			)
+		formatString: 0.0%
+		lineageTag: b0db79d6-a9c7-5dc1-9d49-c03eb7c23528
+
+	measure Profit = CALCULATE(SUM('Order Lines'[Profit]), KEEPFILTERS('Outcome'[Is Cancelled] = "No"))
+		formatString: \$#,0
+		lineageTag: dfb6d310-13cd-589d-ab0c-14938307c777
+
+	measure 'Margin %' = DIVIDE([Profit], [Net Sales])
+		formatString: 0.0%
+		lineageTag: cf11fd8a-2923-5e55-9571-d28223a11ae0
+
+	measure 'Average Order Value' = DIVIDE([Net Sales], CALCULATE([Orders], KEEPFILTERS('Outcome'[Is Cancelled] = "No")))
+		formatString: \$#,0.00
+		lineageTag: e73498dc-4b63-5474-a62c-18e6a8970d06
+
+	measure 'Loss-Making Lines' = CALCULATE([Order Lines], KEEPFILTERS('Outcome'[Is Cancelled] = "No"), KEEPFILTERS('Order Lines'[Profit] < 0))
+		formatString: #,0
+		lineageTag: 300def9b-2f78-56db-a2a4-5967988f2965
+
+	/// About 19% in every department, discount band, mode and market - flat enough to say the
+	/// profit column was generated independently of everything the report can slice it by.
+	measure 'Loss-Making Line Share %' = DIVIDE([Loss-Making Lines], CALCULATE([Order Lines], KEEPFILTERS('Outcome'[Is Cancelled] = "No")))
+		formatString: 0.0%
+		lineageTag: 28133439-71cc-5812-ba2f-c34c460d89f3
+
+	/// Cancelled and suspected-fraud orders. They carry shipping dates anyway.
+	measure 'Cancelled Orders' = CALCULATE([Orders], KEEPFILTERS('Outcome'[Is Cancelled] = "Yes"))
+		formatString: #,0
+		lineageTag: b38aade6-be39-5d8e-87be-60f2c4ffe75c
+
+	measure 'Cancelled Value' = CALCULATE(SUM('Order Lines'[Net Sales]), KEEPFILTERS('Outcome'[Is Cancelled] = "Yes"))
+		formatString: \$#,0
+		lineageTag: df2b6952-dc56-5258-aa80-50b3a7eedc68
+
+	measure 'Cancellation Rate %' = DIVIDE([Cancelled Orders], [Orders])
+		formatString: 0.0%
+		lineageTag: 15b30c1f-8ea0-52dd-9315-cf9c634e19c5
+
+	measure 'Suspected Fraud Orders' = CALCULATE([Orders], KEEPFILTERS('Outcome'[Is Suspected Fraud] = "Yes"))
+		formatString: #,0
+		lineageTag: 2a07739b-63d3-59a2-95d3-734869ed9e65
+
+	measure 'Shipped Orders' = CALCULATE([Orders], KEEPFILTERS('Outcome'[Is Cancelled] = "No"))
+		formatString: #,0
+		lineageTag: 12b4a1af-d7fe-582d-b1ce-6aa232d45197
+
+	measure 'Late Orders' = CALCULATE([Orders], KEEPFILTERS('Outcome'[Is Cancelled] = "No"), KEEPFILTERS('Order Lines'[Is Late] = "Yes"))
+		formatString: #,0
+		lineageTag: 22964fea-cc08-5ace-941e-bec7d418dd4b
+
+	/// Late orders over shipped orders. 57% overall - and 100% for First Class, which promises
+	/// one day and takes two on every one of its 9,602 shipped orders.
+	measure 'Late Rate %' = DIVIDE([Late Orders], [Shipped Orders])
+		formatString: 0.0%
+		lineageTag: 4d8fead3-db7a-5547-950f-86a93d2157fc
+
+	/// On time or early, as a share of shipped orders.
+	measure 'On-Time Rate %' = IF(NOT ISBLANK([Shipped Orders]), 1 - [Late Rate %])
+		formatString: 0.0%
+		lineageTag: e472fe42-c524-5d62-a62d-d08af4ff3c62
+
+	measure 'Early Orders' = CALCULATE([Orders], KEEPFILTERS('Outcome'[Is Cancelled] = "No"), KEEPFILTERS('Order Lines'[Days Late] < 0))
+		formatString: #,0
+		lineageTag: 3688daca-3554-5ca1-bb57-ab410fcbaac7
+
+	/// Orders whose own dates say late, cancelled ones included - what a late rate built from
+	/// the day columns instead of the status returns.
+	measure 'Late by Days, All Orders' = CALCULATE([Orders], KEEPFILTERS('Order Lines'[Days Late] > 0))
+		formatString: #,0
+		lineageTag: c6a21ed6-e917-5fb5-8ebb-774d91ea7bbe
+
+	/// The naive rate: every order's days, cancellations counted in. Shown beside the real one.
+	measure 'Late Rate % (by days, all orders)' = DIVIDE([Late by Days, All Orders], [Orders])
+		formatString: 0.0%
+		lineageTag: 04c78955-24cc-5b2e-8788-91d468cc0ab3
+
+	measure 'Cancelled but Late by Their Dates' = CALCULATE([Orders], KEEPFILTERS('Outcome'[Is Cancelled] = "Yes"), KEEPFILTERS('Order Lines'[Days Late] > 0))
+		formatString: #,0
+		lineageTag: 3fe4cb02-dace-54fa-bba1-8b7a8e267eb6
+
+	/// Mean days to ship per order, shipped orders.
+	measure 'Average Actual Days' =
+			AVERAGEX(
+			    CALCULATETABLE(
+			        SUMMARIZE('Order Lines', 'Order Lines'[Order ID], 'Order Lines'[Actual Days]), KEEPFILTERS('Outcome'[Is Cancelled] = "No")
+			    ),
+			    'Order Lines'[Actual Days]
+			)
+		formatString: 0.00
+		lineageTag: 6b0b5910-0972-5e15-a048-53931d950f40
+
+	measure 'Average Promised Days' =
+			AVERAGEX(
+			    CALCULATETABLE(
+			        SUMMARIZE('Order Lines', 'Order Lines'[Order ID], 'Order Lines'[Promised Days]), KEEPFILTERS('Outcome'[Is Cancelled] = "No")
+			    ),
+			    'Order Lines'[Promised Days]
+			)
+		formatString: 0.00
+		lineageTag: c801d7d2-4c92-53e5-a2d9-a860a0820c48
+
+	/// How late the late orders were, on average.
+	measure 'Average Days Late' =
+			AVERAGEX(
+			    CALCULATETABLE(
+			        SUMMARIZE('Order Lines', 'Order Lines'[Order ID], 'Order Lines'[Days Late]), KEEPFILTERS('Outcome'[Is Cancelled] = "No"), KEEPFILTERS('Order Lines'[Is Late] = "Yes")
+			    ),
+			    'Order Lines'[Days Late]
+			)
+		formatString: 0.00
+		lineageTag: cd4a3b87-86ca-59cb-871e-3585859f4fd9
+
+	/// This market's share of the month's orders - the measure behind the market calendar.
+	measure 'Order Share of Month %' = DIVIDE([Orders], CALCULATE([Orders], REMOVEFILTERS('Geography')))
+		formatString: 0.0%
+		lineageTag: d20e503e-8c89-5a2a-9c45-db80bfb230eb
+
+	/// January to September only: the window every year's main series covers.
+	measure 'Net Sales Jan-Sep' = CALCULATE([Net Sales], KEEPFILTERS('Date'[In Jan To Sep] = "Yes"))
+		formatString: \$#,0
+		lineageTag: af31f687-5966-592d-9402-cf9bb28e4942
+
+	measure 'Net Sales Jan-Sep PY' = CALCULATE([Net Sales Jan-Sep], DATEADD('Date'[Date], -1, YEAR))
+		formatString: \$#,0
+		lineageTag: 8167b58a-1d90-5bb4-8f3a-0d39e544fd33
+
+	/// Like for like. 2017's last quarter and 2018's January belong to the new series.
+	measure 'Net Sales Jan-Sep YoY %' = DIVIDE([Net Sales Jan-Sep] - [Net Sales Jan-Sep PY], [Net Sales Jan-Sep PY])
+		formatString: 0.0%
+		lineageTag: d5024caf-75ef-5021-9292-a9a46e1f15d7
+
+	/// A label for the period on screen: '2016', or 'Jan 2015 to Jan 2018'.
+	measure 'Report Period' =
+			VAR First = MIN('Date'[Date])
+			VAR Last = MAX('Date'[Date])
+			VAR WholeYears = MONTH(First) = 1 && DAY(First) = 1 && MONTH(Last) = 12 && DAY(Last) = 31
+			RETURN
+			    SWITCH(
+			        TRUE(),
+			        WholeYears && YEAR(First) = YEAR(Last), FORMAT(Last, "yyyy"),
+			        FORMAT(First, "mmm yyyy") & " to " & FORMAT(Last, "mmm yyyy")
+			    )
+		lineageTag: 146f541a-dbfa-50b2-a00a-5f9a60e87255
+
+	column Column
+		dataType: string
+		isHidden
+		lineageTag: c2ad94fc-f3a0-54b6-8c0e-0010c23d43fd
+		summarizeBy: none
+		sourceColumn: Column
+
+	partition Metrics = m
+		mode: import
+		source =
+				let
+				    Source = #table(type table [Column = text], {})
+				in
+				    Source
+
+	annotation PBI_ResultType = Table

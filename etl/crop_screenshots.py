@@ -21,7 +21,10 @@ ROOT = Path(__file__).resolve().parents[1]
 SHOTS = ROOT / "screenshots"
 BAND = (0x0A, 0x09, 0x17)
 PAGES = {"pgOverview": "overview", "pgDelivery": "delivery", "pgProducts": "products",
-         "pgMarkets": "markets", "pgQuality": "data-quality"}
+         "pgMarkets": "markets", "pgQuality": "data-quality",
+         # The calendar's four views are four builds (CAL_START_VIEW), one capture each.
+         "pgCalendar_Day": "calendar", "pgCalendar_Month": "calendar-month",
+         "pgCalendar_Quarter": "calendar-quarter", "pgCalendar_Year": "calendar-year"}
 
 # The delivery page carries the report's argument - the promise against the days actually
 # taken - so it is what the site's work card shows.

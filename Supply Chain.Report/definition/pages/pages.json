@@ -5,7 +5,8 @@
     "pgDelivery",
     "pgProducts",
     "pgMarkets",
-    "pgQuality"
+    "pgQuality",
+    "pgCalendar"
   ],
   "activePageName": "pgOverview"
 }

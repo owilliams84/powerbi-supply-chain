@@ -86,6 +86,108 @@ table Date
 		summarizeBy: none
 		sourceColumn: InJanToSep
 
+	column 'Cal Year' = YEAR('Date'[Date])
+		dataType: int64
+		formatString: 0
+		displayFolder: Calendar
+		lineageTag: 0707735f-8b33-5c12-8519-ea061eb4fefd
+		summarizeBy: none
+
+	column 'Cal Month No' = MONTH('Date'[Date])
+		dataType: int64
+		formatString: 0
+		displayFolder: Calendar
+		lineageTag: aefb08f8-9a31-5984-a769-6d1c6b81b53e
+		summarizeBy: none
+
+	/// Month name, January to December.
+	column 'Cal Month' = FORMAT('Date'[Date], "mmmm")
+		dataType: string
+		displayFolder: Calendar
+		lineageTag: f517e666-5b8b-54f8-ad4b-f1565198e606
+		summarizeBy: none
+		sortByColumn: 'Cal Month No'
+
+	column 'Cal Month Short' = FORMAT('Date'[Date], "mmm")
+		dataType: string
+		displayFolder: Calendar
+		lineageTag: 0007557c-f0a4-50ec-823d-d01c28c9697a
+		summarizeBy: none
+		sortByColumn: 'Cal Month No'
+
+	column 'Cal Quarter' = "Q" & ROUNDUP(MONTH('Date'[Date]) / 3, 0)
+		dataType: string
+		displayFolder: Calendar
+		lineageTag: cc9039da-83a6-5ad1-9bd0-dadb381aba8d
+		summarizeBy: none
+
+	column 'Cal Quarter Key' = YEAR('Date'[Date]) * 10 + ROUNDUP(MONTH('Date'[Date]) / 3, 0)
+		dataType: int64
+		formatString: 0
+		displayFolder: Calendar
+		lineageTag: 3506becd-5052-54f0-9797-5bf34820d15a
+		summarizeBy: none
+
+	column 'Cal Quarter Label' = "Q" & ROUNDUP(MONTH('Date'[Date]) / 3, 0) & " " & YEAR('Date'[Date])
+		dataType: string
+		displayFolder: Calendar
+		lineageTag: bf3802ed-2258-5175-a230-389443c61d08
+		summarizeBy: none
+		sortByColumn: 'Cal Quarter Key'
+
+	column 'Cal Month in Quarter No' = MOD(MONTH('Date'[Date]) - 1, 3) + 1
+		dataType: int64
+		formatString: 0
+		displayFolder: Calendar
+		lineageTag: 85cff6d8-680c-5b29-9444-fe7baacc501c
+		summarizeBy: none
+
+	/// The Month view's column headers.
+	column 'Cal Month in Quarter' = SWITCH(MOD(MONTH('Date'[Date]) - 1, 3) + 1, 1, "1st month", 2, "2nd month", "3rd month")
+		dataType: string
+		displayFolder: Calendar
+		lineageTag: 1847c52e-e9ce-5b90-9243-b7ebd37b28c1
+		summarizeBy: none
+		sortByColumn: 'Cal Month in Quarter No'
+
+	/// Monday = 1.
+	column 'Cal Weekday No' = WEEKDAY('Date'[Date], 2)
+		dataType: int64
+		formatString: 0
+		displayFolder: Calendar
+		lineageTag: 0e9a5c4d-ab83-5ac2-9aad-fc60625803ae
+		summarizeBy: none
+
+	/// Mon to Sun, in that order - the Day view's column headers.
+	column 'Cal Day Short' = FORMAT('Date'[Date], "ddd")
+		dataType: string
+		displayFolder: Calendar
+		lineageTag: 0b33e196-2324-5c24-89f1-442a02ca8ff0
+		summarizeBy: none
+		sortByColumn: 'Cal Weekday No'
+
+	column 'Cal Day Name' = FORMAT('Date'[Date], "dddd")
+		dataType: string
+		displayFolder: Calendar
+		lineageTag: 4e3be1cc-3be7-5e32-a71d-5bf299a50deb
+		summarizeBy: none
+		sortByColumn: 'Cal Weekday No'
+
+	/// Which row of a Monday-first month grid the day sits on: 1 to 6.
+	column 'Cal Week of Month' = INT((DAY('Date'[Date]) + WEEKDAY(DATE(YEAR('Date'[Date]), MONTH('Date'[Date]), 1), 2) - 2) / 7) + 1
+		dataType: int64
+		formatString: 0
+		displayFolder: Calendar
+		lineageTag: 9da8ec8d-55ef-590d-8b04-b67ce206e7e0
+		summarizeBy: none
+
+	column 'Cal Week Row' = REPT(UNICHAR(8203), INT((DAY('Date'[Date]) + WEEKDAY(DATE(YEAR('Date'[Date]), MONTH('Date'[Date]), 1), 2) - 2) / 7) + 1)
+		dataType: string
+		displayFolder: Calendar
+		lineageTag: c334bf3b-7322-5e1d-bf3e-8826851aad04
+		summarizeBy: none
+		sortByColumn: 'Cal Week of Month'
+
 	partition Date = m
 		mode: import
 		source =

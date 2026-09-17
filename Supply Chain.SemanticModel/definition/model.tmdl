@@ -18,3 +18,4 @@ ref table 'Shipping Mode'
 ref table Outcome
 ref table 'Order Lines'
 ref table Metrics
+ref table 'Calendar Metrics'

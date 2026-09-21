@@ -62,6 +62,86 @@
           "name": "MilestoneMark.svg",
           "path": "MilestoneMark.svg",
           "type": "Image"
+        },
+        {
+          "name": "IconBag.svg",
+          "path": "IconBag.svg",
+          "type": "Image"
+        },
+        {
+          "name": "IconCalendar.svg",
+          "path": "IconCalendar.svg",
+          "type": "Image"
+        },
+        {
+          "name": "IconCancel.svg",
+          "path": "IconCancel.svg",
+          "type": "Image"
+        },
+        {
+          "name": "IconCart.svg",
+          "path": "IconCart.svg",
+          "type": "Image"
+        },
+        {
+          "name": "IconClock.svg",
+          "path": "IconClock.svg",
+          "type": "Image"
+        },
+        {
+          "name": "IconClockAlert.svg",
+          "path": "IconClockAlert.svg",
+          "type": "Image"
+        },
+        {
+          "name": "IconCoin.svg",
+          "path": "IconCoin.svg",
+          "type": "Image"
+        },
+        {
+          "name": "IconDatabase.svg",
+          "path": "IconDatabase.svg",
+          "type": "Image"
+        },
+        {
+          "name": "IconHourglass.svg",
+          "path": "IconHourglass.svg",
+          "type": "Image"
+        },
+        {
+          "name": "IconPeople.svg",
+          "path": "IconPeople.svg",
+          "type": "Image"
+        },
+        {
+          "name": "IconPercent.svg",
+          "path": "IconPercent.svg",
+          "type": "Image"
+        },
+        {
+          "name": "IconReceipt.svg",
+          "path": "IconReceipt.svg",
+          "type": "Image"
+        },
+        {
+          "name": "IconTag.svg",
+          "path": "IconTag.svg",
+          "type": "Image"
+        },
+        {
+          "name": "IconTrendDown.svg",
+          "path": "IconTrendDown.svg",
+          "type": "Image"
+        },
+        {
+          "name": "IconTruck.svg",
+          "path": "IconTruck.svg",
+          "type": "Image"
+        },
+        {
+          "name": "IconWarning.svg",
+          "path": "IconWarning.svg",
+          "type": "Image"
         }
       ]
     },
